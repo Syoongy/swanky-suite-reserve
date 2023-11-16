@@ -15,7 +15,10 @@ function useRoomsAPI() {
 
   async function addRoom(newRoom: InsertRoom) {
     const { data } = await supabase.from("rooms").insert(newRoom).select();
-    if (data) state.rooms.push(data[0]);
+    if (data) {
+      state.rooms.push(data[0]);
+      return data[0];
+    }
   }
 
   async function editRoom(updateRoom: UpdateRoom, roomId: string) {
