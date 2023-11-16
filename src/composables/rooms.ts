@@ -23,9 +23,17 @@ function useRoomsAPI() {
 
   async function editRoom(updateRoom: UpdateRoom, roomId: string) {
     const { data } = await supabase.from("rooms").update(updateRoom).eq("id", roomId).select();
-    if (data) state.rooms.push(data[0]);
+    if (data) {
+      state.rooms.push(data[0]);
+      return data[0];
+    }
   }
 
-  return { rooms, getRooms, addRoom, editRoom };
+  async function deleteRoom(id: string) {
+    await supabase.from("rooms").delete().eq("id", id);
+    rooms.value = rooms.value.filter((val) => val.id !== id);
+  }
+
+  return { rooms, getRooms, addRoom, editRoom, deleteRoom };
 }
 export { useRoomsAPI };

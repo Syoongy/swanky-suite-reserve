@@ -37,8 +37,17 @@
           <p class="col-span-2">
             {{ room.price_per_hour }}
           </p>
-          <div class="col-span-2 flex justify-end">
-            <Trash2 class="cursor-pointer text-destructive" :size="32" />
+          <div class="col-span-2 flex justify-end gap-2">
+            <Settings
+              class="cursor-pointer text-muted-foreground"
+              :size="24"
+              @click="handleDeleteRoom(room.id)"
+            />
+            <Trash2
+              class="cursor-pointer text-destructive"
+              :size="24"
+              @click="handleDeleteRoom(room.id)"
+            />
           </div>
         </div>
       </CardContent>
@@ -48,13 +57,13 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/toast/use-toast";
-import { Trash2 } from "lucide-vue-next";
+import { Trash2, Settings } from "lucide-vue-next";
 import { vAutoAnimate } from "@formkit/auto-animate/vue";
 import { useRoomsAPI } from "@/composables/rooms";
 import { onBeforeMount, ref } from "vue";
 import NewRoomDialog from "@/components/NewRoomDialog.vue";
 import type { InsertRoom } from "@/types/room";
-const { rooms, getRooms, editRoom, addRoom } = useRoomsAPI();
+const { rooms, getRooms, editRoom, addRoom, deleteRoom } = useRoomsAPI();
 const { toast } = useToast();
 
 const isCreateDialogOpen = ref(false);
@@ -63,12 +72,26 @@ async function handleAddRoom(newRoom: InsertRoom) {
   try {
     const res = await addRoom(newRoom);
     if (res) {
-      toast({ title: "Success", description: `New room with ID: ${res.id}` });
+      toast({ title: "Success", description: `New room with ID: ${res.id}`, class: "bg-primary" });
     }
     isCreateDialogOpen.value = false;
   } catch (error) {
     const err = error as Error;
-    toast({ title: err.name, description: err.message });
+    toast({ title: err.name, description: err.message, variant: "destructive" });
+  }
+}
+
+async function handleDeleteRoom(roomId: string) {
+  try {
+    await deleteRoom(roomId);
+    toast({
+      title: "Success",
+      description: `Deleted room with ID: ${roomId}`,
+      class: "bg-primary"
+    });
+  } catch (error) {
+    const err = error as Error;
+    toast({ title: err.name, description: err.message, variant: "destructive" });
   }
 }
 onBeforeMount(async () => {
