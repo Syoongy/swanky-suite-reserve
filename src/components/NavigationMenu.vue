@@ -4,8 +4,6 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
-  NavigationMenuContent,
   navigationMenuTriggerStyle
 } from "@/components/ui/navigation-menu";
 import {
@@ -17,7 +15,7 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 
-const { removeUser } = useAuthStore();
+const { logout } = useAuthStore();
 const { user, isLoggedIn } = storeToRefs(useAuthStore());
 </script>
 
@@ -49,10 +47,10 @@ const { user, isLoggedIn } = storeToRefs(useAuthStore());
       <NavigationMenuItem>
         <DropdownMenu v-if="isLoggedIn">
           <DropdownMenuTrigger :class="navigationMenuTriggerStyle()">
-            {{ user?.username }}
+            {{ user?.id }}
           </DropdownMenuTrigger>
           <DropdownMenuContent class="border bg-popover-foreground p-2 text-popover">
-            <DropdownMenuItem class="hover:cursor-pointer hover:bg-accent/50" @click="removeUser">
+            <DropdownMenuItem class="hover:cursor-pointer hover:bg-accent/50" @click="logout">
               <span>Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
