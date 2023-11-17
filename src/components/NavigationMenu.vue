@@ -27,11 +27,6 @@ const { user, isLoggedIn } = storeToRefs(useAuthStore());
           <NavigationMenuLink :class="navigationMenuTriggerStyle()">Home</NavigationMenuLink>
         </RouterLink>
       </NavigationMenuItem>
-      <NavigationMenuItem v-if="isLoggedIn">
-        <RouterLink to="/">
-          <NavigationMenuLink :class="navigationMenuTriggerStyle()"> My List </NavigationMenuLink>
-        </RouterLink>
-      </NavigationMenuItem>
       <NavigationMenuItem>
         <RouterLink to="/reservation">
           <NavigationMenuLink :class="navigationMenuTriggerStyle()">
