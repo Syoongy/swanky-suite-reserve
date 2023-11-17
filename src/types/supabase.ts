@@ -11,16 +11,19 @@ export interface Database {
     Tables: {
       bookings: {
         Row: {
+          booking_date: string
           hour: number
           room_id: string
           user_id: string
         }
         Insert: {
+          booking_date: string
           hour?: number
           room_id: string
           user_id?: string
         }
         Update: {
+          booking_date?: string
           hour?: number
           room_id?: string
           user_id?: string
