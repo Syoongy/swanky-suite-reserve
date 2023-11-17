@@ -24,8 +24,8 @@ function useRoomsAPI() {
   async function editRoom(updateRoom: UpdateRoom, roomId: string) {
     const { data } = await supabase.from("rooms").update(updateRoom).eq("id", roomId).select();
     if (data) {
-      state.rooms.push(data[0]);
-      return data[0];
+      const roomIdx = rooms.value.findIndex((val) => val.id === roomId);
+      state.rooms[roomIdx] = data[0];
     }
   }
 

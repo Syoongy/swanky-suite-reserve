@@ -1,17 +1,17 @@
 <template>
   <Dialog :class="{ dark: isDark }">
     <DialogTrigger as-child>
-      <Button> New </Button>
+      <Settings class="cursor-pointer text-muted-foreground" :size="24" />
     </DialogTrigger>
     <DialogContent :class="isDark ? 'dark' : ''">
       <DialogHeader>
-        <DialogTitle>New Room</DialogTitle>
+        <DialogTitle>Edit Room</DialogTitle>
         <DialogDescription>
-          Create a new <span class="text-primary">swanky</span> room available for reseservation
+          Edit your <span class="text-primary">swanky</span> room
         </DialogDescription>
       </DialogHeader>
       <form class="flex flex-col gap-4 text-foreground" @submit.prevent="onSubmit">
-        <FormField v-slot="{ componentField }" name="name">
+        <FormField v-slot="{ componentField }" :model-value="name" name="name">
           <FormItem v-auto-animate>
             <FormLabel>Name</FormLabel>
             <FormControl>
@@ -20,7 +20,7 @@
             <FormMessage />
           </FormItem>
         </FormField>
-        <FormField v-slot="{ componentField }" name="startHour">
+        <FormField v-slot="{ componentField }" :model-value="startHour" name="startHour">
           <FormItem v-auto-animate>
             <FormLabel>Starting Hour</FormLabel>
             <FormControl>
@@ -29,7 +29,7 @@
             <FormMessage />
           </FormItem>
         </FormField>
-        <FormField v-slot="{ componentField }" name="endHour">
+        <FormField v-slot="{ componentField }" :model-value="endHour" name="endHour">
           <FormItem v-auto-animate>
             <FormLabel>Ending Hour</FormLabel>
             <FormControl>
@@ -38,7 +38,7 @@
             <FormMessage />
           </FormItem>
         </FormField>
-        <FormField v-slot="{ componentField }" name="pricePerHour">
+        <FormField v-slot="{ componentField }" :model-value="pricePerHour" name="pricePerHour">
           <FormItem v-auto-animate>
             <FormLabel>Price Per Hour</FormLabel>
             <FormControl>
@@ -49,7 +49,9 @@
         </FormField>
 
         <DialogFooter>
-          <Button type="submit" class="w-full"> Save changes </Button>
+          <DialogClose as-child>
+            <Button type="submit" class="w-full"> Save changes </Button>
+          </DialogClose>
         </DialogFooter>
       </form>
     </DialogContent>
@@ -61,6 +63,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogClose,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -74,7 +77,9 @@ import * as z from "zod";
 import { useForm } from "vee-validate";
 import { vAutoAnimate } from "@formkit/auto-animate/vue";
 import { usePreferredDark } from "@vueuse/core";
-import type { InsertRoom } from "@/types/room";
+import type { RoomRow, UpdateRoom } from "@/types/room";
+import { Settings } from "lucide-vue-next";
+import { onBeforeMount, ref } from "vue";
 
 const isDark = usePreferredDark();
 const formSchema = toTypedSchema(
@@ -93,16 +98,30 @@ const formSchema = toTypedSchema(
 const form = useForm({
   validationSchema: formSchema
 });
+const emits = defineEmits<{ editRoom: [editRoomDetails: UpdateRoom] }>();
+const props = defineProps<{ details: RoomRow }>();
 
-const emits = defineEmits<{ addRoom: [newRoom: InsertRoom] }>();
+const name = ref("");
+const startHour = ref(0);
+const endHour = ref(0);
+const pricePerHour = ref(1);
 
 const onSubmit = form.handleSubmit(async (values) => {
-  emits("addRoom", {
+  emits("editRoom", {
     name: values.name,
     end_hour: values.endHour,
     start_hour: values.startHour,
     price_per_hour: values.pricePerHour
   });
+});
+
+onBeforeMount(() => {
+  if (props.details) {
+    name.value = props.details.name;
+    startHour.value = props.details.start_hour;
+    endHour.value = props.details.end_hour;
+    pricePerHour.value = props.details.price_per_hour;
+  }
 });
 </script>
 

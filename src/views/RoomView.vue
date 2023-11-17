@@ -38,10 +38,9 @@
             {{ room.price_per_hour }}
           </p>
           <div class="col-span-2 flex justify-end gap-2">
-            <Settings
-              class="cursor-pointer text-muted-foreground"
-              :size="24"
-              @click="handleDeleteRoom(room.id)"
+            <EditRoomDialog
+              :details="room"
+              @edit-room="(roomDetails) => handleEditRoom(roomDetails, room.id)"
             />
             <Trash2
               class="cursor-pointer text-destructive"
@@ -57,16 +56,18 @@
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/toast/use-toast";
-import { Trash2, Settings } from "lucide-vue-next";
+import { Trash2 } from "lucide-vue-next";
 import { vAutoAnimate } from "@formkit/auto-animate/vue";
 import { useRoomsAPI } from "@/composables/rooms";
 import { onBeforeMount, ref } from "vue";
 import NewRoomDialog from "@/components/NewRoomDialog.vue";
-import type { InsertRoom } from "@/types/room";
+import EditRoomDialog from "@/components/EditRoomDialog.vue";
+import type { InsertRoom, UpdateRoom } from "@/types/room";
 const { rooms, getRooms, editRoom, addRoom, deleteRoom } = useRoomsAPI();
 const { toast } = useToast();
 
 const isCreateDialogOpen = ref(false);
+const isEditDialogOpen = ref(false);
 
 async function handleAddRoom(newRoom: InsertRoom) {
   try {
@@ -89,6 +90,21 @@ async function handleDeleteRoom(roomId: string) {
       description: `Deleted room with ID: ${roomId}`,
       class: "bg-primary"
     });
+  } catch (error) {
+    const err = error as Error;
+    toast({ title: err.name, description: err.message, variant: "destructive" });
+  }
+}
+
+async function handleEditRoom(roomToUpdate: UpdateRoom, roomId: string) {
+  try {
+    await editRoom(roomToUpdate, roomId);
+    toast({
+      title: "Success",
+      description: `Edited room with ID: ${roomId}`,
+      class: "bg-primary"
+    });
+    isEditDialogOpen.value = false;
   } catch (error) {
     const err = error as Error;
     toast({ title: err.name, description: err.message, variant: "destructive" });
