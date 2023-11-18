@@ -4,8 +4,8 @@ import { supabase } from "@/composables/supabase";
 import type { User } from "@supabase/supabase-js";
 import { useRouter } from "vue-router";
 
-const router = useRouter();
 export const useAuthStore = defineStore("auth", () => {
+  const router = useRouter();
   const user: Ref<User | null> = ref(null);
 
   async function getUser() {
