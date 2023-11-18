@@ -55,13 +55,18 @@ const form = useForm({
 });
 const { toast } = useToast();
 const { signIn } = useAuthStore();
-const { user } = storeToRefs(useAuthStore());
+const { getUserRole } = useAuthStore();
 const router = useRouter();
 
 const onSubmit = form.handleSubmit(async (values) => {
   try {
     await signIn(values.email, values.password);
-    router.push("/");
+    const role = getUserRole();
+    if (role === "admin") {
+      router.push("/room");
+    } else {
+      router.push("/reservation");
+    }
   } catch (error) {
     const err = error as Error;
     toast({

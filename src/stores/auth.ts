@@ -2,7 +2,9 @@ import { computed, ref, type Ref } from "vue";
 import { defineStore } from "pinia";
 import { supabase } from "@/composables/supabase";
 import type { User } from "@supabase/supabase-js";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 export const useAuthStore = defineStore("auth", () => {
   const user: Ref<User | null> = ref(null);
 
@@ -40,14 +42,16 @@ export const useAuthStore = defineStore("auth", () => {
     user.value = userData;
   }
 
-  function getUserRole() {
+  function getUserRole(): string {
     if (user.value) {
       return user.value.user_metadata.role;
     }
+    return "";
   }
 
   async function logout() {
     await supabase.auth.signOut();
+    router.push("/");
     user.value = null;
   }
 
