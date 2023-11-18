@@ -56,7 +56,7 @@
     <CardFooter>
       <p class="pt-2 text-xs text-muted-foreground">
         Already have an account?
-        <RouterLink class="text-secondary-foreground underline" to="/login"> Login </RouterLink>
+        <RouterLink class="text-secondary-foreground underline" to="/"> Login </RouterLink>
       </p>
     </CardFooter>
   </div>
@@ -106,7 +106,7 @@ const { signUp } = useAuthStore();
 const onSubmit = form.handleSubmit(async (values) => {
   try {
     await signUp(values.email, values.password, values.role);
-    router.push("/login");
+    router.push("/");
   } catch (error) {
     const err = error as Error;
     toast({
