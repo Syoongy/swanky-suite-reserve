@@ -1,6 +1,6 @@
-# booking-system
+# Swanky Suite Reserve
 
-This template should help get you started developing with Vue 3 in Vite.
+Welcome to Swanky Suite Reserve, the stylish and efficient solution for managing room reservations in your business or organization. This web app is designed to streamline the process of booking and tracking room reservations, providing a swanky experience for both administrators and users.
 
 ## Recommended IDE Setup
 
@@ -20,6 +20,31 @@ If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has a
 ## Customize configuration
 
 See [Vite Configuration Reference](https://vitejs.dev/config/).
+
+## Setting up the project repository on local machine
+
+1. Make sure you have `node`@20 and [pnpm](https://pnpm.io/installation) installed in your local machine
+
+2. Run this command to install them using volta as the package manager
+```
+# install Volta
+curl https://get.volta.sh | bash
+
+# install Node
+volta install node@20
+
+# install pnpm
+volta install pnpm
+```
+
+3. Ensure you have a [supabase](https://supabase.com/) project created and retrieve the API url and key under `project settings > API > Project URL / Project API keys`
+
+### Make sure to populate the `.env` file based on the `.env.example` provided in the repository
+
+```
+VITE_SUPABASE_URL=<your-supabase-api-url>
+VITE_SUPABASE_KEY=<your-supabase-public-api-key>
+```
 
 ## Project Setup
 
