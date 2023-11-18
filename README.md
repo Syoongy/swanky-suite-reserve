@@ -69,3 +69,16 @@ pnpm build
 ```sh
 pnpm lint
 ```
+
+## Setting up the project repository on Cloudflare Pages
+1. Ensure that you have a Cloudflare account and login to https://dash.cloudflare.com/
+
+2. Navigate to `Workers & Pages` > `Create application` > Connect to git repository with frontend code
+
+3. Once connected, input a project name and select `Vue` for the framework preset
+
+4. Change the build command to `pnpm build`
+
+5. Add all the environment variables from your .env file into the `Environment variables (advanced)` section
+
+6. Click `Save and Deploy`
