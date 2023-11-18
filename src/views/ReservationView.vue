@@ -8,31 +8,63 @@
             Manage your <span class="text-primary">swanky</span> reservations here
           </CardDescription>
         </div>
-        <!-- <NewRoomDialog v-model:open="isCreateDialogOpen" @add-room="handleAddRoom" /> -->
+        <NewReservationDialog
+          v-model:open="isCreateDialogOpen"
+          @add-reservation="handleAddReservation"
+        />
       </CardHeader>
 
       <CardContent class="grid grid-cols-3 gap-2">
-        <ReservationCard />
+        <ReservationCard
+          v-for="reservation in reservations"
+          :key="reservation.room_id + reservation.booking_date"
+          :room-id="reservation.room_id"
+          :booking-date="reservation.booking_date"
+          :hours="reservation.hours"
+        />
       </CardContent>
     </Card>
-    The reservation page
-    <div class="flex w-full gap-2 overflow-x-auto p-2">
-      <Badge class="text-base" v-for="hours in hoursArray" :key="hours">{{ hours }}</Badge>
-    </div>
   </main>
 </template>
 
 <script setup lang="ts">
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import NewReservationDialog from "@/components/NewReservationDialog.vue";
 import ReservationCard from "@/components/ReservationCard.vue";
+import { useReservationsAPI } from "@/composables/reservations";
 import { onBeforeMount, ref } from "vue";
-const hoursArray = ref<string[]>([]);
+import { useToast } from "@/components/ui/toast";
+import { useAuthStore } from "@/stores/auth";
+import { storeToRefs } from "pinia";
 
-onBeforeMount(() => {
-  for (let i = 0; i < 24; i++) {
-    const formattedHour = i.toString().padStart(2, "0");
-    hoursArray.value.push(`${formattedHour}:00`);
+const { reservations, addReservation, getReservations } = useReservationsAPI();
+const { toast } = useToast();
+const { user } = storeToRefs(useAuthStore());
+const isCreateDialogOpen = ref(false);
+
+async function handleAddReservation(roomId: string, selectedDate: string, hours: number[]) {
+  try {
+    if (user.value) {
+      await addReservation(
+        { room_id: roomId, booking_date: selectedDate, user_id: user.value.id },
+        hours
+      );
+      toast({
+        title: "Success",
+        description: `New reservation made with on ${selectedDate}`,
+        class: "bg-primary"
+      });
+    }
+    isCreateDialogOpen.value = false;
+  } catch (error) {
+    const err = error as Error;
+    toast({ title: err.name, description: err.message, variant: "destructive" });
+  }
+}
+
+onBeforeMount(async () => {
+  if (user.value) {
+    getReservations(user.value.id);
   }
 });
 </script>

@@ -1,4 +1,4 @@
-interface BaseReservation {
+export interface BaseReservation {
   booking_date: string;
   room_id: string;
   user_id: string;

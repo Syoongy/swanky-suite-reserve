@@ -13,6 +13,13 @@ function useRoomsAPI() {
     }
   }
 
+  async function getRoomById(id: string) {
+    const res = await supabase.from("rooms").select().eq("id", id);
+    if (res.data) {
+      return res.data[0];
+    }
+  }
+
   async function addRoom(newRoom: InsertRoom) {
     const { data } = await supabase.from("rooms").insert(newRoom).select();
     if (data) {
@@ -34,6 +41,6 @@ function useRoomsAPI() {
     rooms.value = rooms.value.filter((val) => val.id !== id);
   }
 
-  return { rooms, getRooms, addRoom, editRoom, deleteRoom };
+  return { rooms, getRooms, getRoomById, addRoom, editRoom, deleteRoom };
 }
 export { useRoomsAPI };

@@ -1,23 +1,62 @@
-import type { ReservationRow, UpdateReservation, InsertReservation } from "@/types/reservation";
+import type {
+  ReservationRow,
+  UpdateReservation,
+  InsertReservation,
+  BaseReservation,
+  FormattedReservation
+} from "@/types/reservation";
 import { reactive, toRefs } from "vue";
 import { supabase } from "@/composables/supabase";
 
-const state = reactive({ reservations: Array.from<ReservationRow>([]) });
+const state = reactive({ reservations: Array.from<FormattedReservation>([]) });
 
 function useReservationsAPI() {
   const { reservations } = toRefs(state);
+
   async function getReservations(userId: string) {
     const res = await supabase.from("bookings").select().eq("user_id", userId);
     if (res.data) {
-      state.reservations = res.data;
+      state.reservations = res.data.reduce(
+        (formattedArray: FormattedReservation[], reservationRow: ReservationRow) => {
+          // Check if there is already a FormattedReservation for the given room and user
+          const existingFormattedReservation = formattedArray.find(
+            (formattedReservation) =>
+              formattedReservation.room_id === reservationRow.room_id &&
+              formattedReservation.user_id === reservationRow.user_id &&
+              formattedReservation.booking_date === reservationRow.booking_date
+          );
+
+          if (existingFormattedReservation) {
+            // If found, add the hour to the existing FormattedReservation
+            existingFormattedReservation.hours.push(reservationRow.hour);
+          } else {
+            // If not found, create a new FormattedReservation with the current ReservationRow
+            const newFormattedReservation: FormattedReservation = {
+              booking_date: reservationRow.booking_date,
+              room_id: reservationRow.room_id,
+              user_id: reservationRow.user_id,
+              hours: [reservationRow.hour]
+            };
+
+            // Add the new FormattedReservation to the array
+            formattedArray.push(newFormattedReservation);
+          }
+
+          return formattedArray;
+        },
+        []
+      );
     }
   }
 
-  async function addReservation(newReservation: InsertReservation) {
-    const { data } = await supabase.from("bookings").insert(newReservation).select();
+  async function addReservation(newReservation: BaseReservation, hours: number[]) {
+    const reservationItems: InsertReservation[] = [];
+    for (const hour of hours) {
+      reservationItems.push({ ...newReservation, hour });
+    }
+    const { data } = await supabase.from("bookings").insert(reservationItems).select();
     if (data) {
-      state.reservations.push(data[0]);
-      return data[0];
+      // state.reservations = [...state.reservations, ...data];
     }
   }
 
