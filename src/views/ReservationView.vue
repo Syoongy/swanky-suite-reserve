@@ -45,14 +45,17 @@ const isCreateDialogOpen = ref(false);
 async function handleAddReservation(roomId: string, selectedDate: string, hours: number[]) {
   try {
     if (user.value) {
-      await addReservation(
-        { room_id: roomId, booking_date: selectedDate, user_id: user.value.id },
+      await addReservation({
+        room_id: roomId,
+        booking_date: selectedDate,
+        user_id: user.value.id,
         hours
-      );
+      });
       toast({
         title: "Success",
         description: `New reservation made with on ${selectedDate}`,
-        class: "bg-primary"
+        class: "bg-primary",
+        duration: 3000
       });
     }
     isCreateDialogOpen.value = false;

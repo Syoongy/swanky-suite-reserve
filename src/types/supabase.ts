@@ -9,35 +9,35 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      bookings: {
+      reservations: {
         Row: {
           booking_date: string
-          hour: number
+          hours: number[]
           room_id: string
           user_id: string
         }
         Insert: {
           booking_date: string
-          hour?: number
+          hours: number[]
           room_id: string
-          user_id?: string
+          user_id: string
         }
         Update: {
           booking_date?: string
-          hour?: number
+          hours?: number[]
           room_id?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "bookings_room_id_fkey"
+            foreignKeyName: "reservations_room_id_fkey"
             columns: ["room_id"]
             isOneToOne: false
             referencedRelation: "rooms"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "bookings_user_id_fkey"
+            foreignKeyName: "reservations_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"

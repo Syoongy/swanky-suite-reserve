@@ -83,7 +83,7 @@ dayjs.extend(CustomParseFormat);
 
 const isDark = usePreferredDark();
 const { rooms, getRooms } = useRoomsAPI();
-const date = ref<Date>();
+const date = ref<Date>(new Date());
 const emits = defineEmits<{
   addReservation: [roomId: string, selectedDate: string, hours: number[]];
 }>();
@@ -118,6 +118,9 @@ function onSubmit() {
     dayjs(date.value).format("YYYY/MM/DD"),
     selectedHours.value
   );
+  date.value = new Date();
+  selectedHours.value = [];
+  selectedRoomId.value = "";
 }
 
 onBeforeMount(async () => {
