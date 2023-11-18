@@ -39,6 +39,31 @@ volta install pnpm
 
 3. Ensure you have a [supabase](https://supabase.com/) project created and retrieve the API url and key under `project settings > API > Project URL / Project API keys`
 
+4. Create the following tables in Supabase using their SQL Editor
+```SQL
+create table
+  public.rooms (
+    id uuid not null default gen_random_uuid (),
+    name character varying not null default ''::character varying,
+    start_hour smallint not null default '0'::smallint,
+    end_hour smallint not null default '23'::smallint,
+    price_per_hour bigint not null default '1'::bigint,
+    constraint rooms_pkey primary key (id),
+    constraint rooms_name_key unique (name)
+  ) tablespace pg_default;
+
+create table
+  public.reservations (
+    user_id uuid not null,
+    room_id uuid not null,
+    booking_date date not null,
+    hours smallint[] not null,
+    constraint reservations_pkey primary key (user_id, room_id, booking_date),
+    constraint reservations_room_id_fkey foreign key (room_id) references rooms (id) on update cascade on delete cascade,
+    constraint reservations_user_id_fkey foreign key (user_id) references auth.users (id) on update cascade on delete cascade
+  ) tablespace pg_default;
+```
+
 ### Make sure to populate the `.env` file based on the `.env.example` provided in the repository
 
 ```
