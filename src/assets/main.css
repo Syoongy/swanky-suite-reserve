@@ -3,7 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 body {
   font-family: "Be Vietnam Pro", "Inter", sans-serif;
 }
@@ -77,4 +76,20 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+::-webkit-scrollbar {
+  @apply h-2 w-2;
+}
+::-webkit-scrollbar-track {
+  @apply w-2 rounded-xl bg-muted;
+}
+::-webkit-scrollbar-corner {
+  @apply h-0 w-0;
+}
+::-webkit-scrollbar-thumb {
+  @apply rounded-xl bg-muted-foreground;
+}
+::-webkit-scrollbar {
+  @apply rounded-xl bg-muted-foreground;
 }
