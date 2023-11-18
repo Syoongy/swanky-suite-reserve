@@ -1,13 +1,13 @@
 <template>
   <Dialog :class="{ dark: isDark }">
     <DialogTrigger as-child>
-      <Button> New </Button>
+      <Settings class="cursor-pointer text-muted-foreground" :size="24" />
     </DialogTrigger>
     <DialogContent class="" :class="isDark ? 'dark' : ''">
       <DialogHeader class="grow">
-        <DialogTitle>New Reservation</DialogTitle>
+        <DialogTitle>Edit Reservation</DialogTitle>
         <DialogDescription>
-          Create a new <span class="text-primary">swanky</span> reservation
+          Edits a <span class="text-primary">swanky</span> reservation
         </DialogDescription>
       </DialogHeader>
       <form class="flex flex-col items-center gap-4 text-foreground" @submit.prevent="onSubmit">
@@ -48,7 +48,9 @@
           </Badge>
         </div>
         <DialogFooter class="w-full">
-          <Button type="submit" class="w-full"> Make Reservation </Button>
+          <DialogClose as-child>
+            <Button type="submit" class="w-full"> Edit Reservation </Button>
+          </DialogClose>
         </DialogFooter>
       </form>
     </DialogContent>
@@ -60,6 +62,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogClose,
   DialogDescription,
   DialogFooter,
   DialogHeader,
@@ -70,13 +73,14 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Calendar as CalendarIcon } from "lucide-vue-next";
+import { Calendar as CalendarIcon, Settings } from "lucide-vue-next";
 import { usePreferredDark } from "@vueuse/core";
-import { onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref, watch } from "vue";
 import dayjs from "dayjs";
 import CustomParseFormat from "dayjs/plugin/customParseFormat";
 import { useRoomsAPI } from "@/composables/rooms";
 import RoomDisplayCard from "./RoomDisplayCard.vue";
+import type { ReservationRow } from "@/types/reservation";
 
 dayjs.extend(CustomParseFormat);
 
@@ -84,8 +88,9 @@ const isDark = usePreferredDark();
 const { rooms, getRooms } = useRoomsAPI();
 const date = ref<Date>(new Date());
 const emits = defineEmits<{
-  addReservation: [roomId: string, selectedDate: string, hours: number[]];
+  editReservation: [roomId: string, selectedDate: string, hours: number[]];
 }>();
+const props = defineProps<{ reservation: ReservationRow }>();
 const selectedHours = ref<number[]>([]);
 const selectedRoomId = ref<string>("");
 
@@ -99,6 +104,7 @@ function toggleHour(hour: number) {
 }
 
 function selectRoom(id: string) {
+  console.log(id);
   selectedRoomId.value = id;
 }
 
@@ -112,18 +118,26 @@ function isRoomSelected(id: string) {
 
 function onSubmit() {
   emits(
-    "addReservation",
+    "editReservation",
     selectedRoomId.value,
     dayjs(date.value).format("YYYY/MM/DD"),
     selectedHours.value
   );
-  date.value = new Date();
-  selectedHours.value = [];
-  selectedRoomId.value = "";
 }
 
 onBeforeMount(async () => {
   await getRooms();
+  if (props.reservation) {
+    selectedRoomId.value = props.reservation.room_id;
+    selectedHours.value = props.reservation.hours;
+    date.value = dayjs(props.reservation.booking_date, "YYYY/MM/DD").toDate();
+  }
+});
+
+watch(props.reservation, (newReservation) => {
+  selectedRoomId.value = newReservation.room_id;
+  selectedHours.value = newReservation.hours;
+  date.value = dayjs(newReservation.booking_date, "YYYY/MM/DD").toDate();
 });
 </script>
 

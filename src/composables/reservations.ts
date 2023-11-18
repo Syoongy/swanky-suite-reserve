@@ -10,6 +10,9 @@ function useReservationsAPI() {
   async function getReservations(userId: string) {
     const res = await supabase.from("reservations").select().eq("user_id", userId);
     if (res.data) {
+      for (const reservation of res.data) {
+        reservation.hours.sort();
+      }
       state.reservations = res.data;
     }
   }
@@ -21,17 +24,38 @@ function useReservationsAPI() {
     }
   }
 
-  async function editReservation(updateRoom: UpdateReservation, roomId: string) {
-    // const { data } = await supabase.from("bookings").update(updateRoom).eq("id", roomId).select();
-    // if (data) {
-    //   const roomIdx = rooms.value.findIndex((val) => val.id === roomId);
-    //   state.rooms[roomIdx] = data[0];
-    // }
+  async function editReservation(
+    updateReservation: UpdateReservation,
+    oldBookingDate: string,
+    oldRoomId: string,
+    userId: string
+  ) {
+    const { data } = await supabase
+      .from("reservations")
+      .update(updateReservation)
+      .eq("room_id", oldRoomId)
+      .eq("user_id", userId)
+      .eq("booking_date", oldBookingDate)
+      .select();
+    if (data) {
+      const idx = reservations.value.findIndex(
+        (val) => val.room_id === oldRoomId && val.booking_date === oldBookingDate
+      );
+      data[0].hours.sort();
+      state.reservations[idx] = data[0];
+    }
   }
 
-  async function deleteReservation(id: string) {
-    // await supabase.from("bookings").delete().eq("id", id);
-    // rooms.value = rooms.value.filter((val) => val.id !== id);
+  async function deleteReservation(roomId: string, bookingDate: string, userId: string) {
+    await supabase
+      .from("reservations")
+      .delete()
+      .eq("room_id", roomId)
+      .eq("user_id", userId)
+      .eq("booking_date", bookingDate);
+    state.reservations = state.reservations.filter(
+      (val) => !(val.room_id === roomId && val.booking_date === bookingDate)
+    );
   }
 
   return { reservations, getReservations, addReservation, editReservation, deleteReservation };

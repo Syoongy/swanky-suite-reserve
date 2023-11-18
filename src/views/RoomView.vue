@@ -67,7 +67,6 @@ const { rooms, getRooms, editRoom, addRoom, deleteRoom } = useRoomsAPI();
 const { toast } = useToast();
 
 const isCreateDialogOpen = ref(false);
-const isEditDialogOpen = ref(false);
 
 async function handleAddRoom(newRoom: InsertRoom) {
   try {
@@ -104,7 +103,6 @@ async function handleEditRoom(roomToUpdate: UpdateRoom, roomId: string) {
       description: `Edited room with ID: ${roomId}`,
       class: "bg-primary"
     });
-    isEditDialogOpen.value = false;
   } catch (error) {
     const err = error as Error;
     toast({ title: err.name, description: err.message, variant: "destructive" });
